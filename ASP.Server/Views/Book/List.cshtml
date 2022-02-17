@@ -1,0 +1,37 @@
+﻿@using ASP.Server.Model
+@model IEnumerable<Book>
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="listeBooks">
+    <h1>List Books:</h1>
+    <!-- la liste des genres est dans la variable Model qui est typé en ligne 3, elle correspond à la variable xxx dans View(xxx) du controller -->
+    @foreach (var book in Model)
+    {
+        <div style = "margin-top:50px; margin-bottom: 10px">
+        <table style = "border-collapse: collapse; margin-top:100px;margin-bottom: 5px; display: inline"> 
+
+            <tr><td style = "border: 1px solid black">Nom auteur</td><td style ="border: 1px solid black">@book.Author</td></tr>
+             <tr><td style ="border: 1px solid black">Nom Livre</td><td style ="border: 1px solid black">@book.Name</td></tr>
+             <tr><td style ="border: 1px solid black">Prix</td><td style ="border: 1px solid black">@book.Price</td></tr>
+             <tr><td style ="border: 1px solid black">Contenu</td><td style ="border: 1px solid black">@book.Content</td></tr>
+             <tr><td style ="border: 1px solid black">Genre</td><td style ="border: 1px solid black">@foreach(var genre in book.Genres){<div>@genre.Name</div> }</td></tr>
+
+        </table>
+
+       <button type="button"  title="employs" style="width: 100px; margin-right: 5px; position: relative;top: 40px"  onclick="DoComfirm()" return false>Delete</button>
+        <script type="text/javascript">
+          function DoComfirm()
+            {
+                  window.location.href = '@Url.Action("Delete", "Book", new { id = @book.Id})';
+                  if (confirm('@book.Name is removed')) {
+                    window.location.href = '@Url.Action("List", "Book")';
+                  }
+            }
+        </script>
+        <input type="submit" value="Modify" style="width: 100px; margin-right: 5px; position: relative;top: 40px" /></div>
+    }    
+</div>
+
