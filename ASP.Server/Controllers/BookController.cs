@@ -16,6 +16,9 @@ namespace ASP.Server.Controllers
         public String Name { get; set; }
 
         // Ajouter ici tous les champ que l'utilisateur devra remplir pour ajouter un livre
+        public String Author { get; set; }
+        public Double Price { get; set; }
+        public String Content { get; set; }
 
         // Liste des genres séléctionné par l'utilisateur
         public List<int> Genres { get; set; }
@@ -32,11 +35,14 @@ namespace ASP.Server.Controllers
         {
             this.libraryDbContext = libraryDbContext;
         }
-
         public ActionResult<IEnumerable<Book>> List()
         {
             // récupérer les livres dans la base de donées pour qu'elle puisse être affiché
             List<Book> ListBooks = null;
+
+            if (libraryDbContext.Books.ToList() != null)
+                ListBooks = libraryDbContext.Books.Include(book => book.Genres).ToList();
+
             return View(ListBooks);
         }
 
@@ -46,14 +52,24 @@ namespace ASP.Server.Controllers
             if (ModelState.IsValid)
             {
                 // Il faut intéroger la base pour récupérer l'ensemble des objets genre qui correspond aux id dans CreateBookModel.Genres
-                List<Genre> genres = null;
+                List<Genre> genres = libraryDbContext.Genre.Where(genre => book.Genres.Contains(genre.Id)).ToList();
                 // Completer la création du livre avec toute les information nécéssaire que vous aurez ajoutez, et metter la liste des gener récupéré de la base aussi
-                libraryDbContext.Add(new Book() {  });
+                libraryDbContext.Add(new Book() { Name = book.Name, Author = book.Author, Price = book.Price, Content = book.Content, Genres = genres});
                 libraryDbContext.SaveChanges();
             }
 
             // Il faut interoger la base pour récupérer tous les genres, pour que l'utilisateur puisse les slécétionné
-            return View(new CreateBookModel() { AllGenres = null } );
+            return View(new CreateBookModel() { AllGenres = libraryDbContext.Genre.ToList() } );
+        }
+
+        
+        public ActionResult Delete(int id)
+        {
+                libraryDbContext.Remove(libraryDbContext.Find<Book>(id));
+                libraryDbContext.SaveChanges();
+
+                return Ok();
+
         }
     }
 }
